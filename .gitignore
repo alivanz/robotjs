@@ -3,4 +3,5 @@ build/
 
 *.gypi
 *.so
+*.a
 robotgo.h

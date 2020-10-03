@@ -14,7 +14,7 @@
   "devDependencies": {},
   "scripts": {
     "test": "node --napi-modules ./test/test_binding.js",
-    "install": "node-gyp rebuild"
+    "install": "go build -ldflags \"-w -s\" -buildmode=c-archive -o robotgo/robotgo.a ./robotgo && node-gyp rebuild"
   },
   "author": "alivanz",
   "license": "ISC",

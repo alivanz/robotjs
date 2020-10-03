@@ -1,5 +1,5 @@
 #include <napi.h>
-#include "../robotgo.h"
+#include "../robotgo/robotgo.h"
 
 using namespace Napi;
 
