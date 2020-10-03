@@ -5,6 +5,7 @@ assert(robotjs.HelloWorld, "The expected function is undefined");
 
 function testBasic() {
     const result =  robotjs.HelloWorld("hello");
+    robotjs.GoPrint();
     assert.strictEqual(result, "world", "Unexpected value returned");
 }
 

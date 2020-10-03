@@ -15,6 +15,7 @@
         "<!@(node -p \"require('node-addon-api').include\")"
       ],
       "libraries": [
+        "/Users/alivanz/monad/hack/robotjs/robotgo.so"
       ],
       "dependencies": [
         "<!(node -p \"require('node-addon-api').gyp\")"
