@@ -1,0 +1,22 @@
+{
+  "name": "robotjs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "dependencies": {
+    "node-addon-api": "^3.0.2",
+    "node-gyp": "^7.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node --napi-modules ./test/test_binding.js",
+    "install": "node-gyp rebuild"
+  },
+  "author": "alivanz",
+  "license": "ISC",
+  "gypfile": true
+}
