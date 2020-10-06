@@ -24,18 +24,23 @@ func Print(s *C.char) {
 	log.Printf("FROM GO %s", C.GoString(s))
 }
 
-//export EventHook
-func EventHook(p unsafe.Pointer, when C.uint8_t, n C.int, s **C.char, cb unsafe.Pointer) {
+//export eventHook
+func eventHook(when C.uint8_t, n C.int, s **C.char, cb unsafe.Pointer) {
 	keys := make([]string, n)
 	var arr []*C.char
 	hdr := (*reflect.SliceHeader)(unsafe.Pointer(&arr))
 	hdr.Data = uintptr(unsafe.Pointer(s))
 	hdr.Len = int(n)
 	hdr.Cap = int(n)
-	for i, e := range arr {
-		keys[i] = C.GoString(e)
+	for i, cstr := range arr {
+		keys[i] = C.GoString(cstr)
 	}
+	log.Print(when, keys)
 	robotgo.EventHook(uint8(when), keys, func(e hook.Event) {
+		log.Print(e)
+		if cb == nil {
+			return
+		}
 		var event C.Event_t
 		event.Kind = C.uint8_t(e.Kind)
 		event.When = C.uint64_t(e.When.Unix())
@@ -54,13 +59,14 @@ func EventHook(p unsafe.Pointer, when C.uint8_t, n C.int, s **C.char, cb unsafe.
 	})
 }
 
-//export EventStart
-func EventStart() {
-	robotgo.EventStart()
+//export eventProcess
+func eventProcess() {
+	c := robotgo.EventStart()
+	<-robotgo.EventProcess(c)
 }
 
-//export EventEnd
-func EventEnd() {
+//export eventEnd
+func eventEnd() {
 	robotgo.EventEnd()
 }
 
