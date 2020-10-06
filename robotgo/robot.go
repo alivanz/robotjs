@@ -13,8 +13,8 @@ import (
 #include <stdint.h>
 #include "types.h"
 
-static void call_cb(fevent_hook cb, Event_t* event) {
-	cb(event);
+static void call_cb(void* cb, Event_t* event) {
+	((fevent_hook)(cb))(event);
 }
 */
 import "C"
@@ -25,7 +25,7 @@ func Print(s *C.char) {
 }
 
 //export EventHook
-func EventHook(p unsafe.Pointer, when C.uint8_t, n C.int, s **C.char, cb C.fevent_hook) {
+func EventHook(p unsafe.Pointer, when C.uint8_t, n C.int, s **C.char, cb unsafe.Pointer) {
 	keys := make([]string, n)
 	var arr []*C.char
 	hdr := (*reflect.SliceHeader)(unsafe.Pointer(&arr))
@@ -36,7 +36,21 @@ func EventHook(p unsafe.Pointer, when C.uint8_t, n C.int, s **C.char, cb C.feven
 		keys[i] = C.GoString(e)
 	}
 	robotgo.EventHook(uint8(when), keys, func(e hook.Event) {
-		C.call_cb(cb, nil)
+		var event C.Event_t
+		event.Kind = C.uint8_t(e.Kind)
+		event.When = C.uint64_t(e.When.Unix())
+		event.Mask = C.uint16_t(e.Mask)
+		event.Keycode = C.uint16_t(e.Keycode)
+		event.Rawcode = C.uint16_t(e.Rawcode)
+		event.Keychar = C.uint8_t(e.Keychar)
+		event.Button = C.uint16_t(e.Button)
+		event.Clicks = C.uint16_t(e.Clicks)
+		event.X = C.int16_t(e.X)
+		event.Y = C.int16_t(e.Y)
+		event.Amount = C.uint16_t(e.Amount)
+		event.Rotation = C.int32_t(e.Rotation)
+		event.Direction = C.uint8_t(e.Direction)
+		C.call_cb(cb, &event)
 	})
 }
 
