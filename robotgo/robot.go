@@ -34,13 +34,10 @@ func eventHook(when C.uint8_t, n C.int, s **C.char, cb unsafe.Pointer) {
 	for i, cstr := range arr {
 		keys[i] = C.GoString(cstr)
 	}
-	log.Print(when, keys)
 	hook.Register(uint8(when), keys, func(e hook.Event) {
-		log.Print(e)
 		if cb == nil {
 			return
 		}
-		log.Print(e)
 		poll <- cb
 		// var event C.Event_t
 		// event.Kind = C.uint8_t(e.Kind)
