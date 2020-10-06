@@ -15,6 +15,10 @@
         "<!@(node -p \"require('node-addon-api').include\")"
       ],
       "libraries": [
+        # MACOS
+        "-framework Cocoa",
+        "-framework OpenGL",
+        "-framework IOKit",
         "<!@(pwd)/robotgo/robotgo.a"
       ],
       "dependencies": [
