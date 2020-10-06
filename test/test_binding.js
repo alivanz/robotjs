@@ -6,8 +6,16 @@ assert(robotjs.HelloWorld, "The expected function is undefined");
 function testBasic() {
     const result =  robotjs.HelloWorld("hello");
     robotjs.GoPrint();
-    robotjs.EventHook(robotjs.KeyDown, ["w"]);
-    robotjs.EventHook(robotjs.KeyDown, ["ctrl", "w"]);
+    robotjs.EventHook(robotjs.KeyDown, ["w"], function(){
+      console.log("w pressed")
+    });
+    robotjs.EventHook(robotjs.KeyDown, ["ctrl", "w"], function(){
+      console.log("ctrl+w pressed")
+    });
+    robotjs.EventHook(robotjs.KeyDown, ["ctrl", "q"], function(){
+      console.log("quit")
+      robotjs.EventEnd()
+    });
     robotjs.EventProcess();
     assert.strictEqual(result, "world", "Unexpected value returned");
 }

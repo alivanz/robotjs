@@ -5,19 +5,18 @@ import (
 	"reflect"
 	"unsafe"
 
-	"github.com/go-vgo/robotgo"
 	hook "github.com/robotn/gohook"
 )
 
 /*
 #include <stdint.h>
 #include "types.h"
-
-static void call_cb(void* cb, Event_t* event) {
-	((fevent_hook)(cb))(event);
-}
 */
 import "C"
+
+var (
+	poll chan unsafe.Pointer
+)
 
 //export Print
 func Print(s *C.char) {
@@ -36,38 +35,53 @@ func eventHook(when C.uint8_t, n C.int, s **C.char, cb unsafe.Pointer) {
 		keys[i] = C.GoString(cstr)
 	}
 	log.Print(when, keys)
-	robotgo.EventHook(uint8(when), keys, func(e hook.Event) {
+	hook.Register(uint8(when), keys, func(e hook.Event) {
 		log.Print(e)
 		if cb == nil {
 			return
 		}
-		var event C.Event_t
-		event.Kind = C.uint8_t(e.Kind)
-		event.When = C.uint64_t(e.When.Unix())
-		event.Mask = C.uint16_t(e.Mask)
-		event.Keycode = C.uint16_t(e.Keycode)
-		event.Rawcode = C.uint16_t(e.Rawcode)
-		event.Keychar = C.uint8_t(e.Keychar)
-		event.Button = C.uint16_t(e.Button)
-		event.Clicks = C.uint16_t(e.Clicks)
-		event.X = C.int16_t(e.X)
-		event.Y = C.int16_t(e.Y)
-		event.Amount = C.uint16_t(e.Amount)
-		event.Rotation = C.int32_t(e.Rotation)
-		event.Direction = C.uint8_t(e.Direction)
-		C.call_cb(cb, &event)
+		log.Print(e)
+		poll <- cb
+		// var event C.Event_t
+		// event.Kind = C.uint8_t(e.Kind)
+		// event.When = C.uint64_t(e.When.Unix())
+		// event.Mask = C.uint16_t(e.Mask)
+		// event.Keycode = C.uint16_t(e.Keycode)
+		// event.Rawcode = C.uint16_t(e.Rawcode)
+		// event.Keychar = C.uint8_t(e.Keychar)
+		// event.Button = C.uint16_t(e.Button)
+		// event.Clicks = C.uint16_t(e.Clicks)
+		// event.X = C.int16_t(e.X)
+		// event.Y = C.int16_t(e.Y)
+		// event.Amount = C.uint16_t(e.Amount)
+		// event.Rotation = C.int32_t(e.Rotation)
+		// event.Direction = C.uint8_t(e.Direction)
+		// log.Print("go call back")
+		// C.call_cb(helper, cb, &event)
 	})
+}
+
+//export pollEventCallback
+func pollEventCallback() unsafe.Pointer {
+	select {
+	case ptr := <-poll:
+		return ptr
+	}
 }
 
 //export eventProcess
 func eventProcess() {
-	c := robotgo.EventStart()
-	<-robotgo.EventProcess(c)
+	poll = make(chan unsafe.Pointer)
+	go func() {
+		c := hook.Start()
+		<-hook.Process(c)
+		close(poll)
+	}()
 }
 
 //export eventEnd
 func eventEnd() {
-	robotgo.EventEnd()
+	hook.End()
 }
 
 func main() {

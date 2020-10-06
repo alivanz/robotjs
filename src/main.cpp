@@ -12,6 +12,8 @@ Napi::String Method(const Napi::CallbackInfo& info) {
   return Napi::String::New(env, "world");
 }
 
+static FunctionReference f;
+
 Napi::Boolean EventHook(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
   Napi::Array arr = info[1].As<Napi::Array>();
@@ -23,11 +25,14 @@ Napi::Boolean EventHook(const Napi::CallbackInfo& info) {
     const char *cstr = strdup(s.c_str());
     list[i] = cstr;
   }
+  Napi::Function callback = info[2].As<Napi::Function>();
+  f = Napi::Persistent(callback);
+  f.SuppressDestruct();
   eventHook(
     info[0].ToNumber().Uint32Value(),
     n,
     (char **)list,
-    0
+    (void*)reinterpret_cast<Napi::Function*>(&callback)
   );
   for (int i=0; i<n; i++) {
     free((void *)list[i]);
@@ -38,7 +43,17 @@ Napi::Boolean EventHook(const Napi::CallbackInfo& info) {
 
 Napi::Boolean EventProcess(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
+  printf("event start\n");
   eventProcess();
+  while (1) {
+    void *ptr = pollEventCallback();
+    if (!ptr) {
+      printf("poll %p\n", ptr);
+      break;
+    }
+    f.Call(std::vector<napi_value>());
+  }
+  printf("event end\n");
   return Napi::Boolean::New(env, true);
 }
 Napi::Boolean EventEnd(const Napi::CallbackInfo& info) {
