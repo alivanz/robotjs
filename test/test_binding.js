@@ -1,8 +1,6 @@
 const robotjs = require("../index.js");
 const assert = require("assert");
 
-assert(robotjs.HelloWorld, "The expected function is undefined");
-
 function testBasic() {
     robotjs.EventHook(robotjs.KeyDown, ["w"], function(){
       console.log("w pressed")
