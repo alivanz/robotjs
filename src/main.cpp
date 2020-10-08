@@ -4,15 +4,6 @@
 
 using namespace Napi;
 
-void GoPrint(const Napi::CallbackInfo& info) {
-  Print("hehehhehe");
-}
-
-Napi::String Method(const Napi::CallbackInfo& info) {
-  Napi::Env env = info.Env();
-  return Napi::String::New(env, "world");
-}
-
 static int mi;
 static std::map<int,Napi::FunctionReference> m;
 
@@ -29,6 +20,7 @@ Napi::Boolean EventHook(const Napi::CallbackInfo& info) {
   }
   Napi::Function callback = info[2].As<Napi::Function>();
   m[mi] = Napi::Persistent(callback);
+  m[mi].SuppressDestruct();
   eventHook(
     info[0].ToNumber().Uint32Value(),
     n,
@@ -63,14 +55,6 @@ Napi::Boolean EventEnd(const Napi::CallbackInfo& info) {
 }
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
-  exports.Set(
-    Napi::String::New(env, "HelloWorld"),
-    Napi::Function::New(env, Method)
-  );
-  exports.Set(
-    Napi::String::New(env, "GoPrint"),
-    Napi::Function::New(env, GoPrint)
-  );
   exports.Set(
     Napi::String::New(env, "EventHook"),
     Napi::Function::New(env, EventHook)

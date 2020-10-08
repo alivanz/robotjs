@@ -18,11 +18,6 @@ var (
 	poll chan unsafe.Pointer
 )
 
-//export Print
-func Print(s *C.char) {
-	log.Printf("FROM GO %s", C.GoString(s))
-}
-
 //export eventHook
 func eventHook(when C.uint8_t, n C.int, s **C.char, cb unsafe.Pointer) {
 	keys := make([]string, n)

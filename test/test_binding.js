@@ -4,8 +4,6 @@ const assert = require("assert");
 assert(robotjs.HelloWorld, "The expected function is undefined");
 
 function testBasic() {
-    const result =  robotjs.HelloWorld("hello");
-    robotjs.GoPrint();
     robotjs.EventHook(robotjs.KeyDown, ["w"], function(){
       console.log("w pressed")
     });
