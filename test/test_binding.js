@@ -1,29 +1,19 @@
 const robotjs = require("../index.js");
-const assert = require("assert");
 
-function testBasic() {
-    // robotjs.EventHook(robotjs.KeyDown, ["w"], function(){
-    //   console.log("w pressed")
-    // });
-    // robotjs.EventHook(robotjs.KeyDown, ["ctrl", "w"], function(){
-    //   console.log("ctrl+w pressed")
-    // });
-    // robotjs.EventHook(robotjs.KeyDown, ["ctrl", "q"], function(){
-    //   console.log("quit")
-    //   robotjs.EventEnd()
-    // });
-    // robotjs.EventProcess();
-    // assert.strictEqual(result, "world", "Unexpected value returned");
-    robotjs.EventAll(function(e) {
-      console.log(e)
-      if (e.key_code == 16) {
-        robotjs.EventEnd()
-      }
-    });
-}
-
-testBasic();
-
-assert.doesNotThrow(testBasic, undefined, "testBasic threw an expection");
+var listener = new robotjs.EventListener()
+listener.attach(robotjs.KeyDown, ["ctrl"], function(){
+  console.log("ctrl pressed")
+})
+listener.attach(robotjs.KeyUp, ["ctrl"], function(){
+  console.log("ctrl released")
+})
+listener.attach(robotjs.KeyDown, ["alt"], function(){
+  console.log("quit")
+  listener.end()
+})
+listener.any(function(e){
+  console.log(e)
+})
+listener.run()
 
 console.log("Tests passed- everything looks OK!");
