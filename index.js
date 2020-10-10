@@ -105,6 +105,7 @@ class EventListener {
       when: when,
       keys: keys,
       cb: cb,
+      prev: false,
     })
   }
   any(cb) {
@@ -129,20 +130,20 @@ class EventListener {
   }
   run() {
     robotjs.EventAll((e)=>{
-      var prev = this.pressed_list()
       if (e.kind == 3 || e.kind == 4) {
         this.pressed[e.key_code] = true
       } else if (e.kind == 5) {
         this.pressed[e.key_code] = false
       }
       var current = this.pressed_list()
-      for (var i=0; i<prev.length; i++) {
+      for (var i=0; i<current.length; i++) {
         var listener = this.listener[i]
-        if (listener.when == 3 && !prev[i] && current[i]) {
+        if (listener.when == 3 && !listener.prev && current[i]) {
           listener.cb()
-        } else if (listener.when == 5 && prev[i] && !current[i]) {
+        } else if (listener.when == 5 && listener.prev && !current[i]) {
           listener.cb()
         }
+        listener.prev = current[i]
       }
     })
   }

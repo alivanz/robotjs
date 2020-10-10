@@ -7,6 +7,12 @@ listener.attach(robotjs.KeyDown, ["ctrl"], function(){
 listener.attach(robotjs.KeyUp, ["ctrl"], function(){
   console.log("ctrl released")
 })
+listener.attach(robotjs.KeyDown, ["ctrl", "shift"], function(){
+  console.log("ctrl+shift pressed")
+})
+listener.attach(robotjs.KeyUp, ["ctrl", "shift"], function(){
+  console.log("ctrl+shift released")
+})
 listener.attach(robotjs.KeyDown, ["alt"], function(){
   console.log("quit")
   listener.end()
