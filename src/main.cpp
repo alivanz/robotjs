@@ -7,6 +7,52 @@ using namespace Napi;
 static int mi;
 static std::map<int,Napi::FunctionReference> m;
 
+Napi::Value NewEvent(Napi::Env env, Event_t *event) {
+  Napi::Object obj = Napi::Object::New(env);
+  obj.Set(
+    Napi::String::New(env, "kind"),
+    Napi::Number::New(env, event->Kind)
+  );
+  obj.Set(
+    Napi::String::New(env, "when"),
+    Napi::Number::New(env, event->When)
+  );
+  obj.Set(
+    Napi::String::New(env, "key_code"),
+    Napi::Number::New(env, event->Keycode)
+  );
+  obj.Set(
+    Napi::String::New(env, "button"),
+    Napi::Number::New(env, event->Button)
+  );
+  obj.Set(
+    Napi::String::New(env, "X"),
+    Napi::Number::New(env, event->X)
+  );
+  obj.Set(
+    Napi::String::New(env, "Y"),
+    Napi::Number::New(env, event->Y)
+  );
+  return obj;
+}
+
+Napi::Value EventAll(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+  void *c = eventStartListen();
+  Napi::Function handler = info[0].As<Napi::Function>();
+  while (1) {
+    Event_t *event = (Event_t *)eventRead(c);
+    if (!event) {
+      return env.Undefined();
+    }
+    std::vector<napi_value> args = {
+      NewEvent(env, event)
+    };
+    free(event);
+    handler.Call(args);
+  }
+}
+
 Napi::Boolean EventHook(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
   Napi::Array arr = info[1].As<Napi::Array>();
@@ -66,6 +112,10 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
   exports.Set(
     Napi::String::New(env, "EventEnd"),
     Napi::Function::New(env, EventEnd)
+  );
+  exports.Set(
+    Napi::String::New(env, "EventAll"),
+    Napi::Function::New(env, EventAll)
   );
   return exports;
 }

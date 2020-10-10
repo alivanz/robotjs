@@ -25,6 +25,10 @@ func add() {
 		fmt.Println("w")
 	})
 
+	robotgo.EventHook(hook.MouseMove, []string{}, func(e hook.Event) {
+		fmt.Println("mouse")
+	})
+
 	s := robotgo.EventStart()
 	<-robotgo.EventProcess(s)
 }

@@ -4,6 +4,8 @@ module.exports = {
   "EventProcess": robotjs.EventProcess,
   "EventEnd":     robotjs.EventEnd,
 
+  "EventAll":     robotjs.EventAll,
+
   // HookEnabled honk enable status
 	HookEnabled  : 1,
 	HookDisabled : 2,
