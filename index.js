@@ -120,14 +120,6 @@ class EventListener {
     }
     return true
   }
-  pressed_list() {
-    var values = []
-    for (var i=0; i<this.listener.length; i++) {
-      var listener = this.listener[i]
-      values.push(this.all_pressed(listener.keys))
-    }
-    return values
-  }
   run() {
     robotjs.EventAll((e)=>{
       if (e.kind == 3 || e.kind == 4) {
@@ -135,15 +127,15 @@ class EventListener {
       } else if (e.kind == 5) {
         this.pressed[e.key_code] = false
       }
-      var current = this.pressed_list()
-      for (var i=0; i<current.length; i++) {
+      for (var i=0; i<this.listener.length; i++) {
         var listener = this.listener[i]
-        if (listener.when == 3 && !listener.prev && current[i]) {
+        var current = this.all_pressed(listener.keys)
+        if (listener.when == 3 && !listener.prev && current) {
           listener.cb()
-        } else if (listener.when == 5 && listener.prev && !current[i]) {
+        } else if (listener.when == 5 && listener.prev && !current) {
           listener.cb()
         }
-        listener.prev = current[i]
+        listener.prev = current
       }
     })
   }
